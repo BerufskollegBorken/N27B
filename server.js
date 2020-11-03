@@ -1,3 +1,17 @@
+
+var anfangskapital = 100
+var zinssatz = 5
+var laufzeit = 10
+
+
+
+
+
+
+
+
+
+
 // Klassendefinition. Die Klasse ist der Bauplan, 
 // der alle relevanten Eigenschaften enthält.
 // Nach der Deklaration wird mit dem reservierten Wort
