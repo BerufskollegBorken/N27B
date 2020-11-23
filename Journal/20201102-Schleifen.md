@@ -72,4 +72,19 @@ for(var z = 0; z < 3; z++){
 }
 ```
 
-### Erstelle eine Zinseszins-Rechnung für ein Sparbuch.
+### Erstelle einen Zinseszins-Rechner für die N27-App.
+
+1. ejs-Datei von Profil bearbeiten kopieren und einfügen.
+2. Button in die index.ejsmit dem Aufdruck "Zinseszins berechnen"
+3. Wir brauchen folgende Komponenten:
+* Kontostand
+* Laufzeit
+* Zinssatz
+4. Für jede Komponente muss es ein Input geben
+5. Ein Button der die Berechnung anstößt
+6. in der server.js: 
+* app.get
+* app.post
+* Funktion zur Berechnung der Zinseszinsen
+    
+
