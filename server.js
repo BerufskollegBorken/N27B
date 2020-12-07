@@ -1,17 +1,4 @@
 
-var anfangskapital = 100
-var zinssatz = 5
-var laufzeit = 10
-
-
-
-
-
-
-
-
-
-
 // Klassendefinition. Die Klasse ist der Bauplan, 
 // der alle relevanten Eigenschaften enthält.
 // Nach der Deklaration wird mit dem reservierten Wort
@@ -412,6 +399,56 @@ app.get('/kontoAbfragen',(req, res, next) => {
             meldung : "Hallo"                             
         })
     }else{
+        res.render('login.ejs', {                    
+        })    
+    }
+})
+
+
+app.get('/zinsrechnung',(req, res, next) => {   
+
+    let idKunde = req.cookies['istAngemeldetAls']
+
+
+    if(idKunde){
+        console.log("Kunde ist angemeldet als " + idKunde)
+        res.render('zinsrechnung.ejs', { 
+            meldung : "Hallo"                             
+        })
+    }else{
+        res.render('login.ejs', {                    
+        })    
+    }
+})
+
+
+app.post('/zinsrechnung',(req, res, next) => {   
+
+    let idKunde = req.cookies['istAngemeldetAls']
+    
+    if(idKunde){
+        console.log("Kunde ist angemeldet als " + idKunde)
+        var kapital = req.body.startkapital
+        console.log("Kapital: " + kapital)
+        var zinssatz = req.body.zinssatz
+        console.log("Zinsssatz: " + zinssatz)
+        var laufzeit = req.body.laufzeit
+        console.log("Laufzeit: "+ laufzeit)
+
+        var jahr;
+        for (jahr = 0; jahr < laufzeit ; jahr++)
+        {
+            kapital = kapital * zinssatz / 100 + parseFloat(kapital)
+            console.log("E-Kapital:" + kapital)
+        }
+
+        res.render('zinsrechnung.ejs', {                              
+            meldung : "Die Zinsen wurden berechnet. Endkapital:" + kapital 
+        })
+    }else{
+        // Die login.ejs wird gerendert 
+        // und als Response
+        // an den Browser übergeben.
         res.render('login.ejs', {                    
         })    
     }
