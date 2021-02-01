@@ -95,6 +95,26 @@ dbVerbindung.connect(function(err){
     })
 })
 
+
+// Wir brauchen eine neue Tabelle namens Kontobewegung
+// Der Primärschlüssel ist: IBAN und Timestamp
+// Die Eigenschaften sind: iban VARCHAR(22), betrag DECIMAL(15,2), verwendungszweck VARCHAR(140), timestamp Timestamp
+
+dbVerbindung.connect(function(err){
+
+    dbVerbindung.query("CREATE TABLE kontobewegung(iban VARCHAR(22), betrag DECIMAL(15,2), verwendungszweck VARCHAR(140), timestamp Timestamp, PRIMARY KEY(iban, timestamp), FOREIGN KEY (iban) REFERENCES konto(iban));", function(err, result){
+        if(err){
+            if(err.code === "ER_TABLE_EXISTS_ERROR"){
+                console.log("Die Tabelle kontobewegung existiert bereits.")
+            }else{
+                console.log("Es ist ein Fehler aufgetreten: " + err)
+            }            
+        }else{
+            console.log("Tabelle kontobewegung erstellt.")    
+        }        
+    })
+})
+
 kunde.Mail = "s150123@berufskolleg-borken.de"
 kunde.Nachname = "N"
 kunde.Vorname = "V"
@@ -336,9 +356,12 @@ app.post('/ueberweisen',(req, res, next) => {
         
         // Das Zielkonto und der Betrag wird aus dem Formular entgegengenommen.
 
-        let zielkontonummer = req.body.zielkontonummer
+        let zieliban = req.body.zieliban
         let betrag = req.body.betrag
         
+
+
+
         /*
         // Der aktuelle Anfangssaldo wird aus der Datenbank ausgelesen
 
