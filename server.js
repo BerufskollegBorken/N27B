@@ -48,8 +48,10 @@ app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
 
+// 20210201
+
 const dbVerbindung = mysql.createConnection({
-    host: "10.40.38.110",
+    host: "130.255.124.99",
     port: "3306",
     database: "dbn27",
     user: "placematman",
