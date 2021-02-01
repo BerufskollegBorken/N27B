@@ -47,17 +47,17 @@ app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
 
-// 20210201
+// Die Congig.js einbinden:
 
 const env = process.env.NODE_ENV || 'development';
 const config = require('./config')[env];
 
 const dbVerbindung = mysql.createConnection({
-    host: "130.255.124.99",
-    port: "3306",
-    database: "dbn27",
-    user: "placematman",
-    password: "BKB123456!"
+    host: config.database.host,  /* Adresse des Servers */
+    port: config.database.port,  /* Auf einem Rechner können verschiedene Dienste auf verschiedenen Ports angeboten werden */
+    database: config.database.db,
+    user: config.database.user,
+    password: config.database.password
 })
 
 dbVerbindung.connect()
@@ -66,7 +66,7 @@ dbVerbindung.connect()
 
 dbVerbindung.connect(function(err){
 
-    dbVerbindung.query("CREATE TABLE konto(iban VARCHAR(22), idKunde INT(11), anfangssaldo DECIMAL(15,2), kontoart VARCHAR(20), timestamp TIMESTAMP, PRIMARY KEY(iban));", function(err, result){
+    dbVerbindung.query("CREATE TABLE konto(iban VARCHAR(22), idKunde INT(11), kontoart VARCHAR(20), timestamp TIMESTAMP, PRIMARY KEY(iban));", function(err, result){
         if(err){
             if(err.code === "ER_TABLE_EXISTS_ERROR"){
                 console.log("Die Tabelle konto existiert bereits.")
@@ -78,6 +78,7 @@ dbVerbindung.connect(function(err){
         }        
     })
 })
+
 
 dbVerbindung.connect(function(err){
 
@@ -193,6 +194,8 @@ app.get('/impressum',(req, res, next) => {
     }
 })
 
+// Die app.get() wird abgearbeitet, wenn die Seite im Browser aufgerufen wird.
+
 app.get('/kontoAnlegen',(req, res, next) => {   
 
     let idKunde = req.cookies['istAngemeldetAls']
@@ -207,6 +210,8 @@ app.get('/kontoAnlegen',(req, res, next) => {
         })    
     }
 })
+
+// Die Funktion wird abgearbeitet, wenn der Button gedrückt wird.
 
 app.post('/kontoAnlegen',(req, res, next) => {   
 
@@ -225,8 +230,8 @@ app.post('/kontoAnlegen',(req, res, next) => {
    
         konto.Kontonummer = req.body.kontonummer
         konto.Kontoart = req.body.kontoart
-        konto.Anfangssaldo = req.body.anfangssaldo
         konto.IdKunde = idKunde 
+        console.log(idKunde)
 
         const bankleitzahl = "27000000"
         const laenderkennung = "DE"
@@ -239,7 +244,7 @@ app.post('/kontoAnlegen',(req, res, next) => {
        
         dbVerbindung.connect(function(err){
 
-            dbVerbindung.query("INSERT INTO konto(iban, idKunde, anfangssaldo, kontoart, timestamp) VALUES ('" + konto.Iban + "'," + konto.IdKunde + "," + konto.Anfangssaldo + ",'" + konto.Kontoart + "', NOW());", function(err, result){
+            dbVerbindung.query("INSERT INTO konto(iban, idKunde, kontoart, timestamp) VALUES ('" + konto.Iban + "'," + kunde.IdKunde + ",'" + konto.Kontoart + "', NOW());", function(err, result){
                 if(err){         
                     if(err.code == "ER_DUP_ENTRY")   
                         console.log("Das Konto " + konto.Iban + " existiert bereits.")
