@@ -1,4 +1,3 @@
-
 // Klassendefinition. Die Klasse ist der Bauplan, 
 // der alle relevanten Eigenschaften enthält.
 // Nach der Deklaration wird mit dem reservierten Wort
@@ -49,6 +48,9 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
 
 // 20210201
+
+const env = process.env.NODE_ENV || 'development';
+const config = require('./config')[env];
 
 const dbVerbindung = mysql.createConnection({
     host: "130.255.124.99",
