@@ -188,8 +188,8 @@ app.post('/',(req, res, next) => {
     // if-Kontrollstruktur ausgeführt.
 
     if(idKunde == kunde.IdKunde && kennwort == kunde.Kennwort){
-        console.log("Der Cookie wird gesetzt")
-        res.cookie('istAngemeldetAls','idKunde')
+        console.log("Der Cookie wird gesetzt: " + idKunde)
+        res.cookie('istAngemeldetAls', idKunde)
         res.render('index.ejs', {                    
         })
     }else{
@@ -235,8 +235,7 @@ app.get('/kontoAnlegen',(req, res, next) => {
 
 app.post('/kontoAnlegen',(req, res, next) => {   
 
-    let idKunde = req.cookies['istAngemeldetAls']
-    
+    let idKunde = req.cookies['istAngemeldetAls']    
     if(idKunde){
 
 // Von der Klasse Konto wird ein Objekt namens konto 
