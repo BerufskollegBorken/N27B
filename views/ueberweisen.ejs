@@ -24,8 +24,29 @@
       <a href="/profilBearbeiten"><i class="fa fa-id-card-o" aria-hidden="true"></i></a>        
     </nav>
     <form method="POST" action="/ueberweisen">          
-        <label>Ziel-Iban:</label>          
-        <input type="text" name="zieliban">
+      <label>QuellIban:</label>                
+      <select name="cars" id="cars">
+
+        <!-- 
+          Alle quellIbans aus dem Datenbank-Result werden in einer Schleife durchlaufen.
+          Aus jedem einzelnen Element der Liste quellibans wird die Iban ausgelesen
+         -->
+        <% for(var i=0; i< quellIbans.length; i++) {%>              
+          <option value="<%= quellIbans[i].iban %>"><%= quellIbans[i].iban %></option>                  
+        <% } %> 
+
+        </select>
+
+      <label>ZielIban:</label>          
+      <!--
+        
+        Hausaufgabe:
+        Die Zielibans müssen ebenfalls aus einem Auswahlmenü gewählt werden. Bitte umsetzen.
+      
+      -->
+        <input type="text" name="zielIban">
+        <label>Verwendungszweck:</label>          
+        <input type="text" name="verwendungszweck" pattern="[0-139]{140}">
         <label>Betrag:</label>          
         <input type="number" name="betrag">          
         <button>Überweisen</button>

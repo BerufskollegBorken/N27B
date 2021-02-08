@@ -104,7 +104,7 @@ dbVerbindung.connect(function(err){
 
 dbVerbindung.connect(function(err){
 
-    dbVerbindung.query("CREATE TABLE kontobewegung(iban VARCHAR(22), betrag DECIMAL(15,2), verwendungszweck VARCHAR(140), timestamp Timestamp, PRIMARY KEY(iban, timestamp), FOREIGN KEY (iban) REFERENCES konto(iban));", function(err, result){
+    dbVerbindung.query("CREATE TABLE kontobewegung(quellIban VARCHAR(22), zielIban VARCHAR(22), betrag DECIMAL(15,2), verwendungszweck VARCHAR(140), timestamp Timestamp, PRIMARY KEY(quellIban, timestamp), FOREIGN KEY (quellIban) REFERENCES konto(iban));", function(err, result){
         if(err){
             if(err.code === "ER_TABLE_EXISTS_ERROR"){
                 console.log("Die Tabelle kontobewegung existiert bereits.")
@@ -121,7 +121,7 @@ kunde.Mail = "s150123@berufskolleg-borken.de"
 kunde.Nachname = "N"
 kunde.Vorname = "V"
 kunde.Kennwort = "123"
-kunde.IdKunde = 150129
+kunde.IdKunde = 150000
 
 dbVerbindung.connect(function(err){
     dbVerbindung.query("INSERT INTO kunde(idKunde,vorname,nachname,kennwort,mail) VALUES (" + kunde.IdKunde + ", '" + kunde.Vorname + "', '" + kunde.Nachname + "', '" + kunde.Kennwort + "','" + kunde.Mail + "');", function(err, result){
@@ -332,15 +332,48 @@ app.post('/profilBearbeiten',(req, res, next) => {
 
 app.get('/ueberweisen',(req, res, next) => {   
 
+    // Wenn der Kunde angemeldet ist, wird seine Kunden-ID als Cookie im Browser gespeichert.
+    // Der Cookie wird ausgelesen und an die Variable namens idKunde zugewiesen
+
     let idKunde = req.cookies['istAngemeldetAls']
     
+    // Wenn idKunde einen Wert annimmt, dann ist idKunde == true
+
     if(idKunde){
         console.log("Kunde ist angemeldet als " + idKunde)
         
-        // ... dann wird kontoAnlegen.ejs gerendert.
+        // Die Ibans des Kunden mit der idKunde werden aus der Datenbank ausgelesen:
+
+        dbVerbindung.connect(function(err){
+
+            dbVerbindung.query("SELECT iban FROM konto WHERE idKunde = '" + idKunde + "';", function(err, result){
+                if(err){
+                    console.log("Es ist ein Fehler aufgetreten: " + err)
+                }else{
+                    
+                console.group(result)
+
+                // Hausaufgabe: Hier muss die dbVerbindung.query() zur Datenbank hergestellt werden, um alle gültigen ZielIbans auszulesen. 
+                // Die Verbindungen werden also ineinander geschachtelt.
+                // Die res.render()-Zeilen müssen in den Rumpf der innerern dbVerbindung.query() gelegt werden.
+                // Der Result der inneren dbVerbindung.query() muss dann anders benannt werden. Z.B. result2 oder resultZielIbans
+
+
+                
+                // ... dann wird kontoAnlegen.ejs gerendert.
         
-        res.render('ueberweisen.ejs', {    
-            meldung : ""                          
+                res.render('ueberweisen.ejs', {    
+                    meldung : "",
+                    quellIbans : result                          
+                })
+                    
+                // Hausaufgabe
+
+
+
+
+                }        
+            })
         })
     }else{
         res.render('login.ejs', {                    
