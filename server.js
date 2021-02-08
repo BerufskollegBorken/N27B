@@ -52,12 +52,13 @@ app.use(cookieParser())
 const env = process.env.NODE_ENV || 'development';
 const config = require('./config')[env];
 
+// 20210208
+
 const dbVerbindung = mysql.createConnection({
-    host: config.database.host,  /* Adresse des Servers */
-    port: config.database.port,  /* Auf einem Rechner können verschiedene Dienste auf verschiedenen Ports angeboten werden */
-    database: config.database.db,
-    user: config.database.user,
-    password: config.database.password
+    host: '10.40.38.110', //130.255.124.99
+    user: 'placematman',
+    password: "BKB123456!",
+    database: "dbn27"
 })
 
 dbVerbindung.connect()
@@ -95,6 +96,7 @@ dbVerbindung.connect(function(err){
     })
 })
 
+// 20210808
 
 // Wir brauchen eine neue Tabelle namens Kontobewegung
 // Der Primärschlüssel ist: IBAN und Timestamp
