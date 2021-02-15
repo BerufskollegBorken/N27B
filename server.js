@@ -149,7 +149,8 @@ app.get('/',(req, res, next) => {
     
     if(idKunde){
         console.log("Kunde ist angemeldet als " + idKunde)
-        res.render('index.ejs', {                              
+        res.render('index.ejs', {     
+            meldung : ""                         
         })
     }else{
         res.render('login.ejs', {                    
@@ -192,7 +193,8 @@ app.post('/',(req, res, next) => {
     if(idKunde == kunde.IdKunde && kennwort == kunde.Kennwort){
         console.log("Der Cookie wird gesetzt: " + idKunde)
         res.cookie('istAngemeldetAls', idKunde)
-        res.render('index.ejs', {                    
+        res.render('index.ejs', {        
+            meldung : ""            
         })
     }else{
         console.log("Der Cookie wird gelöscht")
@@ -388,28 +390,30 @@ app.post('/ueberweisen',(req, res, next) => {
         
         // Das Zielkonto und der Betrag wird aus dem Formular entgegengenommen.
 
-        let quellIban = req.body.quelliban
-        let zieliban = req.body.zieliban
+        let quellIban = req.body.quellIban
+        let zielIban = req.body.zielIban
         let betrag = req.body.betrag
         let verwendungszweck = req.body.verwendungszweck
                 
+        console.log(quellIban + "->" + zielIban + ", " + betrag + " Euro," + verwendungszweck)
+
         // Der aktuelle Anfangssaldo wird aus der Datenbank ausgelesen
 
         dbVerbindung.connect(function(err){
 
-            dbVerbindung.query("INSERT INTO kontobewegung(quellIban, zieliban, betrag, verwendungszweck, timestamp) VALUES ('" + quellIban + "', '" + zieliban + "', " + (Math.abs(betrag) * -1) + ",'" + verwendungszweck + "', NOW());", function(err, result){
+            dbVerbindung.query("INSERT INTO kontobewegung(quellIban, zielIban, betrag, verwendungszweck, timestamp) VALUES ('" + quellIban + "', '" + zielIban + "', " + (Math.abs(betrag) * -1) + ",'" + verwendungszweck + "', NOW());", function(err, result){
                 if(err){
                     console.log("Es ist ein Fehler aufgetreten: " + err)
                 }else{
-                    console.log("Die Überweisung wurde abgebucht.")    
+                    console.log("Die Überweisung i.H.v. " + betrag + " Euro wurde abgebucht von Konto " + quellIban + ".")    
                 }        
             })
 
-            dbVerbindung.query("INSERT INTO kontobewegung(zieliban, quellIban, betrag, verwendungszweck, timestamp) VALUES ('" + quellIban + "', '" + zieliban + "', " + betrag + ",'" + verwendungszweck + "', NOW());", function(err, result){
+            dbVerbindung.query("INSERT INTO kontobewegung(zielIban, quellIban, betrag, verwendungszweck, timestamp) VALUES ('" + quellIban + "', '" + zielIban + "', " + betrag + ",'" + verwendungszweck + "', NOW());", function(err, result){
                 if(err){
                     console.log("Es ist ein Fehler aufgetreten: " + err)
                 }else{
-                    console.log("Die Überweisung wurde gutgeschrieben.")    
+                    console.log("Die Überweisung i.H.v. " + betrag + " wurde gutgeschrieben auf Konto " + zielIban)    
                 }        
             })
         })

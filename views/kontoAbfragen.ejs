@@ -23,6 +23,29 @@
       <a href="mailto:stefan.baeumer@berufskolleg-borken.de"> <i class="fa fa-envelope-o"></i></a>
       <a href="/profilBearbeiten"><i class="fa fa-id-card-o" aria-hidden="true"></i></a>        
     </nav>    
+
+    <!--
+      Hausaufgabe:
+
+      Wenn der Kunde in der App auf Konto abfragen klickt, dann soll er aus seinen Konten das gewünschte wählen können.
+      Anscjhließend wird der Kontostand angezeigt.
+
+      Im Einzelnen ist also Folgendes zu tun:
+      1. Formular in der kontoAbfragen.ejs einbauen
+      2. Auswahlmenü in das Formular einbauen (vgl. ueberweisen.ejs)
+      3. In der server.js 'app.get('/kontoAbfragen' ausprogrammieren, so dass beim Laden der Seite nur die 
+         eigenen Konten zur Auswahl angeboten werden.
+      4. In der server.js eine app.post nau anlegen und ebenfalls ausprogrammieren, indem
+          1. die gewählte iban eingelesen wird (req.body....)
+          2. die Datenbank so abgefragt wird, dass zu der requesteten iban alle Kontobewegungen ausgelesen werden.
+             Dazu gibt es zwei Möglichkeiten: 
+              ->Entweder wird eine sogenannte Aggregat-Abfrage gegen die DB gefeuert, die
+                dann die aufaddierten Beträge als einzelne Zahl zurückgibt, oder
+              ->Alle Beträge werden als Array in Javascript eingelesen und dann in einer Schleife mit jedem Schleifendurchlauf aufaddiert.
+      5. Der Result muss dann gerendert weden.
+    -->
+
+
     <%= meldung %>
   </body>
 </html>
