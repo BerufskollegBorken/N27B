@@ -25,31 +25,29 @@
     </nav>
     <form method="POST" action="/ueberweisen">          
       <label>QuellIban:</label>                
-      <select name="cars" id="cars">
+      <select name="quellIban">
 
-        <!-- 
-          Alle quellIbans aus dem Datenbank-Result werden in einer Schleife durchlaufen.
-          Aus jedem einzelnen Element der Liste quellibans wird die Iban ausgelesen
-         -->
-        <% for(var i=0; i< quellIbans.length; i++) {%>              
-          <option value="<%= quellIbans[i].iban %>"><%= quellIbans[i].iban %></option>                  
+      <!-- 
+        Alle quellIbans aus dem Datenbank-Result werden in einer Schleife durchlaufen.
+        Aus jedem einzelnen Element der Liste quellibans wird die Iban ausgelesen
+        -->
+      <% for(var i=0; i< quellIbans.length; i++) {%>              
+        <option value="<%= quellIbans[i].iban %>"><%= quellIbans[i].iban %></option>                  
+      <% } %> 
+
+      </select>
+
+      <label>ZielIban:</label>   
+      <select name="zielIban">
+        <% for(var i=0; i< zielIbans.length; i++) {%>              
+          <option value="<%= zielIbans[i].iban %>"><%= zielIbans[i].iban %></option>                  
         <% } %> 
-
-        </select>
-
-      <label>ZielIban:</label>          
-      <!--
-        
-        Hausaufgabe:
-        Die Zielibans müssen ebenfalls aus einem Auswahlmenü gewählt werden. Bitte umsetzen.
-      
-      -->
-        <input type="text" name="zielIban">
-        <label>Verwendungszweck:</label>          
-        <input type="text" name="verwendungszweck" pattern="[0-139]{140}">
-        <label>Betrag:</label>          
-        <input type="number" name="betrag">          
-        <button>Überweisen</button>
+      </select>
+      <label>Verwendungszweck:</label>          
+      <input type="text" name="verwendungszweck">
+      <label>Betrag:</label>          
+      <input type="number" name="betrag">          
+      <button>Überweisen</button>
     </form>  
     <%= meldung %>
   </body>

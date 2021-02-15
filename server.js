@@ -346,32 +346,30 @@ app.get('/ueberweisen',(req, res, next) => {
 
         dbVerbindung.connect(function(err){
 
-            dbVerbindung.query("SELECT iban FROM konto WHERE idKunde = '" + idKunde + "';", function(err, result){
+            var quellkonten
+
+            dbVerbindung.query("SELECT iban FROM konto WHERE idKunde = '" + idKunde + "';", function(err, quellkontenResult){
+                if(err){
+                    console.log("Es ist ein Fehler aufgetreten: " + err)
+                }else{                    
+                    console.log(quellkontenResult)                    
+                    quellkonten = quellkontenResult       
+                }        
+            })
+
+            dbVerbindung.query("SELECT iban FROM konto;", function(err, zielkontenResult){
                 if(err){
                     console.log("Es ist ein Fehler aufgetreten: " + err)
                 }else{
+                    console.log(zielkontenResult)
                     
-                console.group(result)
-
-                // Hausaufgabe: Hier muss die dbVerbindung.query() zur Datenbank hergestellt werden, um alle gültigen ZielIbans auszulesen. 
-                // Die Verbindungen werden also ineinander geschachtelt.
-                // Die res.render()-Zeilen müssen in den Rumpf der innerern dbVerbindung.query() gelegt werden.
-                // Der Result der inneren dbVerbindung.query() muss dann anders benannt werden. Z.B. result2 oder resultZielIbans
-
-
-                
-                // ... dann wird kontoAnlegen.ejs gerendert.
-        
-                res.render('ueberweisen.ejs', {    
-                    meldung : "",
-                    quellIbans : result                          
-                })
-                    
-                // Hausaufgabe
-
-
-
-
+                    // ... dann wird kontoAnlegen.ejs gerendert.
+            
+                    res.render('ueberweisen.ejs', {    
+                        meldung : "",
+                        quellIbans : quellkonten,
+                        zielIbans : zielkontenResult
+                    })
                 }        
             })
         })
@@ -390,47 +388,33 @@ app.post('/ueberweisen',(req, res, next) => {
         
         // Das Zielkonto und der Betrag wird aus dem Formular entgegengenommen.
 
+        let quellIban = req.body.quelliban
         let zieliban = req.body.zieliban
         let betrag = req.body.betrag
-        
-
-
-
-        /*
+        let verwendungszweck = req.body.verwendungszweck
+                
         // Der aktuelle Anfangssaldo wird aus der Datenbank ausgelesen
 
         dbVerbindung.connect(function(err){
 
-            dbVerbindung.query("SELECT anfangssaldo FROM konto WHERE iban = '" + zielkontonummer + "';", function(err, result){
+            dbVerbindung.query("INSERT INTO kontobewegung(quellIban, zieliban, betrag, verwendungszweck, timestamp) VALUES ('" + quellIban + "', '" + zieliban + "', " + (Math.abs(betrag) * -1) + ",'" + verwendungszweck + "', NOW());", function(err, result){
                 if(err){
                     console.log("Es ist ein Fehler aufgetreten: " + err)
                 }else{
-                    console.log("Tabelle erstellt bzw. schon existent.")    
+                    console.log("Die Überweisung wurde abgebucht.")    
                 }        
             })
-        })
-        */
 
-
-        //ToDo: Saldo um den Betrag reduzieren mit einem SQL-UPDATE.
-
-        dbVerbindung.connect(function(err){
-
-            dbVerbindung.query("UPDATE konto SET anfangssaldo = anfangssaldo + " + betrag + " WHERE iban = '" + zielkontonummer + "' ;", function(err, result){
+            dbVerbindung.query("INSERT INTO kontobewegung(zieliban, quellIban, betrag, verwendungszweck, timestamp) VALUES ('" + quellIban + "', '" + zieliban + "', " + betrag + ",'" + verwendungszweck + "', NOW());", function(err, result){
                 if(err){
                     console.log("Es ist ein Fehler aufgetreten: " + err)
                 }else{
-                    console.log("Tabelle erstellt bzw. schon existent.")                     
+                    console.log("Die Überweisung wurde gutgeschrieben.")    
                 }        
             })
         })
-
-
-        //ToDo: Betrag beim Zielkonto gutschreiben mit einem SQL-UPDATE.
-
-        // Umsetzung mit einer gemeinsamen relationalen Datenbank.
-
-        res.render('ueberweisen.ejs', {                              
+       
+        res.render('index.ejs', {                              
             meldung : "Die Überweisung wurde erfolgreich ausgeführt."
         })
     }else{
