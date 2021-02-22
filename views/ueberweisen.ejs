@@ -46,7 +46,7 @@
       <label>Verwendungszweck:</label>          
       <input type="text" name="verwendungszweck">
       <label>Betrag:</label>          
-      <input type="number" name="betrag">          
+      <input type="number" min="0.01" step="0.01" name="betrag">          
       <button>Überweisen</button>
     </form>  
     <%= meldung %>

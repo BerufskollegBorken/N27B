@@ -2,20 +2,18 @@
 // der alle relevanten Eigenschaften enthält.
 // Nach der Deklaration wird mit dem reservierten Wort
 // 'new' ein Objekt der Klasse instanziiert.
+// Alle Objekte der Klasse haben dieselben Eigenschaften, aber unterschiedliche Eigenschaftswerte
 
 class Konto{
     constructor(){
         this.Iban
         this.Kontonummer
-        this.Kontoart
-        this.Anfangssaldo
+        this.Kontoart        
         // Die IdKunde ist eine Eigenschaft von Konto.
         // Jedes Konto wird einem Kunden zugeordnet.
         this.IdKunde
     }
 }
-
-let konto 
 
 class Kunde{
     constructor(){
@@ -35,6 +33,14 @@ class Kunde{
 let kunde = new Kunde()
 
 // Initialisierung
+
+kunde.Mail = "s150123@berufskolleg-borken.de"
+kunde.Nachname = "N"
+kunde.Vorname = "V"
+kunde.Kennwort = "123"
+kunde.IdKunde = 150000
+
+
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -116,12 +122,6 @@ dbVerbindung.connect(function(err){
         }        
     })
 })
-
-kunde.Mail = "s150123@berufskolleg-borken.de"
-kunde.Nachname = "N"
-kunde.Vorname = "V"
-kunde.Kennwort = "123"
-kunde.IdKunde = 150000
 
 dbVerbindung.connect(function(err){
     dbVerbindung.query("INSERT INTO kunde(idKunde,vorname,nachname,kennwort,mail) VALUES (" + kunde.IdKunde + ", '" + kunde.Vorname + "', '" + kunde.Nachname + "', '" + kunde.Kennwort + "','" + kunde.Mail + "');", function(err, result){
@@ -401,6 +401,8 @@ app.post('/ueberweisen',(req, res, next) => {
 
         dbVerbindung.connect(function(err){
 
+            //
+
             dbVerbindung.query("INSERT INTO kontobewegung(quellIban, zielIban, betrag, verwendungszweck, timestamp) VALUES ('" + quellIban + "', '" + zielIban + "', " + (Math.abs(betrag) * -1) + ",'" + verwendungszweck + "', NOW());", function(err, result){
                 if(err){
                     console.log("Es ist ein Fehler aufgetreten: " + err)
@@ -409,7 +411,7 @@ app.post('/ueberweisen',(req, res, next) => {
                 }        
             })
 
-            dbVerbindung.query("INSERT INTO kontobewegung(zielIban, quellIban, betrag, verwendungszweck, timestamp) VALUES ('" + quellIban + "', '" + zielIban + "', " + betrag + ",'" + verwendungszweck + "', NOW());", function(err, result){
+            dbVerbindung.query("INSERT INTO kontobewegung(zielIban, quellIban, betrag, verwendungszweck, timestamp) VALUES ('" + quellIban + "', '" + zielIban + "', " + Math.abs(betrag) + ",'" + verwendungszweck + "', NOW());", function(err, result){
                 if(err){
                     console.log("Es ist ein Fehler aufgetreten: " + err)
                 }else{
@@ -434,23 +436,22 @@ app.get('/kontoAbfragen',(req, res, next) => {
 
     let idKunde = req.cookies['istAngemeldetAls']
     
-    dbVerbindung.connect(function(err){
-
-        dbVerbindung.query("SELECT anfangssaldo FROM konto WHERE idKunde = '" + idKunde + "';", function(err, result){
-            if(err){
-                console.log("Es ist ein Fehler aufgetreten: " + err)
-            }else{
-                if(result[0] != null)
-                    console.log("Kontostand wurde erfolgreich abgefragt. Der Kontostand ist: " + result[0].anfangssaldo)                                     
-            }        
-        })
-    })
-
-
     if(idKunde){
-        console.log("Kunde ist angemeldet als " + idKunde)
-        res.render('kontoAbfragen.ejs', { 
-            meldung : "Hallo"                             
+
+        dbVerbindung.connect(function(err){
+
+            dbVerbindung.query("SELECT iban FROM konto WHERE idKunde = '" + idKunde + "';", function(err, abfrageKontenResult){
+                if(err){
+                    console.log("Es ist ein Fehler aufgetreten: " + err)
+                }else{                    
+                    console.log(abfrageKontenResult)                                               
+                }        
+
+                res.render('kontoAbfragen.ejs', {    
+                    meldung : "",
+                    abfrageIbans : abfrageKontenResult
+                })
+            })            
         })
     }else{
         res.render('login.ejs', {                    
@@ -458,6 +459,44 @@ app.get('/kontoAbfragen',(req, res, next) => {
     }
 })
 
+app.post('/kontoAbfragen',(req, res, next) => {   
+
+    let idKunde = req.cookies['istAngemeldetAls']
+    
+    if(idKunde){
+        console.log("Kunde ist angemeldet als " + idKunde)
+        
+        // Das Zielkonto und der Betrag wird aus dem Formular entgegengenommen.
+        
+        let abfrageIban = req.body.abfrageIban
+        let kontostand = 0
+         
+        dbVerbindung.connect(function(err){
+
+            dbVerbindung.query("SELECT betrag, verwendungszweck FROM kontobewegung WHERE quellIban = '" + abfrageIban + "';", function(err, result){
+                if(err){
+                    console.log("Es ist ein Fehler aufgetreten: " + err)
+                }else{
+                    
+                    for(var i = 0; i < result.length; i++){
+                        kontostand = kontostand + result[i].betrag 
+                        console.log("Kontostand: " + kontostand)                        
+                    }
+                }        
+
+                res.render('index.ejs', {                              
+                    meldung : "Der Kontostand des Kontos mit der IBAN " + abfrageIban + " ist " + kontostand + "€."
+                })
+            })
+        })
+    }else{
+        // Die login.ejs wird gerendert 
+        // und als Response
+        // an den Browser übergeben.
+        res.render('login.ejs', {                    
+        })    
+    }
+})
 
 app.get('/zinsrechnung',(req, res, next) => {   
 

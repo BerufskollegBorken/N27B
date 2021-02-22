@@ -24,11 +24,27 @@
       <a href="/profilBearbeiten"><i class="fa fa-id-card-o" aria-hidden="true"></i></a>        
     </nav>    
 
+    <form method="POST" action="/kontoAbfragen">          
+      <label>Von welchem Konto soll der Kontostand abgefragt werden?</label>                
+      <select name="abfrageIban">
+
+      <!-- 
+        Alle abfrageIbans aus dem Datenbank-Result werden in einer Schleife durchlaufen.
+        Aus jedem einzelnen Element der Liste quellibans wird die Iban ausgelesen
+        -->
+      <% for(var i=0; i< abfrageIbans.length; i++) {%>              
+        <option value="<%= abfrageIbans[i].iban %>"><%= abfrageIbans[i].iban %></option>                  
+      <% } %> 
+
+      </select>
+      <button>Konto abfragen</button>
+    </form>  
+
     <!--
       Hausaufgabe:
 
       Wenn der Kunde in der App auf Konto abfragen klickt, dann soll er aus seinen Konten das gewünschte wählen können.
-      Anscjhließend wird der Kontostand angezeigt.
+      Anschließend wird der Kontostand angezeigt.
 
       Im Einzelnen ist also Folgendes zu tun:
       1. Formular in der kontoAbfragen.ejs einbauen
