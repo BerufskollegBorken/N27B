@@ -30,7 +30,15 @@
       <button formaction="/ueberweisen">Überweisen</button>
       <button formaction="/kontoAbfragen">Konto abfragen</button>
       <button formaction="/zinsrechnung">Endkapital berechnen</button>
-    </form>     
-    <label><%= meldung %></label>
+    </form>    
+     
+    <label>Herzlich willkommen! Die Temperatur in </label>
+    
+    <form method="POST" action="/">
+      <label><%= ortsangabe %></label>                
+      <input type="text" name="ortsangabe" value="<%= ortsangabe %>" title="Bitte hier den Ort angeben.">
+      <label><%= meldung %></label>                
+      <button>Wetter abfragen</button>
+    </form>  
   </body>
 </html>

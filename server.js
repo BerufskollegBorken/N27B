@@ -47,6 +47,8 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const mysql = require('mysql')
 const iban = require('iban')
+const weather = require('weather-js')
+
 const app = express()
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
@@ -149,14 +151,55 @@ app.get('/',(req, res, next) => {
     
     if(idKunde){
         console.log("Kunde ist angemeldet als " + idKunde)
-        res.render('index.ejs', {     
-            meldung : ""                         
-        })
+
+        weather.find({search: 'Borken', degreeType: 'C'}, function(err, result) {
+            if(err) console.log(err);
+           
+            console.log("Der ganze Result: " + result)
+            // Der Result ist eine Liste von Objekten. Wenn der angegebene Ortsname mehrfach existiert, hat die Liste mehr als einen Eintrag.
+            console.log("Vom ersten Element der Name des Orts " + result[0].location.name);
+            console.log("Vom ersten Element die aktuelle Temperatur :" + result[0].current.temperature);
+
+            res.render('index.ejs', {
+                meldung : result[0].location.name + " beträgt " + result[0].current.temperature + "°" + result[0].location.degreetype + ".",
+                ortsangabe : "Borken"
+            })
+          });
     }else{
         res.render('login.ejs', {                    
         })    
     }
 })
+
+app.post('/',(req, res, next) => {   
+
+    let idKunde = req.cookies['istAngemeldetAls']
+    
+    if(idKunde){
+        console.log("Kunde ist angemeldet als " + idKunde)
+
+        let ortsangabe = req.body.ortsangabe
+
+        weather.find({search: ortsangabe, degreeType: 'C'}, function(err, result) {
+            if(err) console.log(err);
+           
+            console.log("Der ganze Result: " + result)
+            // Der Result ist eine Liste von Objekten. Wenn der angegebene Ortsname mehrfach existiert, hat die Liste mehr als einen Eintrag.
+            console.log("Vom ersten Element der Name des Orts " + result[0].location.name);
+            console.log("Vom ersten Element die aktuelle Temperatur :" + result[0].current.temperature);
+
+            res.render('index.ejs', {
+                meldung : "Herzlich willkommen! Die Temperatur in " + result[0].location.name + " beträgt " + result[0].current.temperature + "°" + result[0].location.degreetype + ".",
+                ortsangabe : result[0].location.name
+            })
+          });
+    }else{
+        res.render('login.ejs', {                    
+        })    
+    }
+})
+
+
 
 app.get('/login',(req, res, next) => {         
     res.cookie('istAngemeldetAls', '')       
